@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Details</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212; /* Dark theme background */
+            color: #ffffff; /* Light text */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+  .card-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px;
+  }
+
+  .card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    position: relative;
+  }
+
+  .card .date {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .card .left {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 14px;
+    color: #555;
+  }
+
+  .card .right {
+    font-size: 24px;
+    font-weight: bold;
+    color: green;
+    text-align: center;
+  }
+
+  .card .jcb-details div,
+  .card .tipper-details div {
+    margin-bottom: 3px;
+  }
+
+  .jcb-details .highlight,
+  .tipper-details .highlight {
+    font-size: 18px;
+    color: #d68400;
+  }
+
+
+
+
+        /* Header styles */
+        .header {
+            background-color: #1E1E1E; /* Darker header background */
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .header div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header div strong {
+            color: #FFD700; /* Highlight key info */
+        }
+
+        /* Container styles */
+        .container {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: #1E1E1E; /* Card background */
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .card div {
+            margin-bottom: 10px;
+        }
+/* Footer Buttons */
+.fixed-buttons {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #1E1E1E; /* Footer background */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.btn {
+    flex: 1;
+    margin: 0 10px;
+    padding: 12px;
+    font-size: 16px;
+    text-align: center;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-to-get {
+    background-color: #1db954; /* Green */
+}
+
+.btn-received {
+    background-color: #FF4d4d; /* Red */
+}
+
+/* Mic Button */
+.mic-button {
+    position: absolute;
+    bottom: 30px; /* Same as padding */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px; /* Circle size */
+    height: 60px; /* Circle size */
+    background-color: #3b82f6; /* Blue color for the mic button */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+/* Mic Icon (Font Awesome or similar) */
+.mic-icon {
+    font-size: 24px; /* Adjust icon size */
+    color: white;
+    display: block;
+}
+
+
+
+        /* Popup styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1E1E1E;
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            z-index: 1000;
+        }
+
+        .popup.active {
+            display: block;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #FFD700;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid #FFD700;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #FFD700;
+        }
+        .date-time-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.date-time-container input[type="date"],
+.date-time-container input[type="time"] {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #FFD700;
+    border-radius: 4px;
+    background: #1E1E1E;
+    color: #ffffff;
+}
+.filter-options {
+    display: flex;
+    justify-content: center;
+    gap: 12px; /* Adds spacing between buttons */
+    padding: 12px;
+    background: linear-gradient(90deg, #00296B, #00509D); /* Modern gradient */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px; /* Rounded container */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.filter-button {
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFFFFF;
+    background: #003F88; /* Button background */
+    border: 2px solid transparent; /* Transparent border */
+    border-radius: 25px; /* Fully rounded buttons */
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+}
+
+.filter-button:hover {
+    background: #FFD500; /* Bright hover effect */
+    color: #00296B;
+    transform: translateY(-2px); /* Slight elevation */
+}
+
+.filter-button.active {
+    background: #FDC500; /* Active state highlight */
+    color: #00296B;
+    border: 2px solid #FFD500; /* Add a bright border */
+    transform: scale(1.1); /* Make it slightly larger */
+}
+
+.filter-button:focus {
+    outline: none;
+    box-shadow: 0 0 12px #FFD500; /* Glow effect for focus */
+}
+
+.filter-button:active {
+    transform: scale(1); /* Reset scaling on click */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2); /* Inset shadow for click */
+}
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #FFD700;
+            border-radius: 4px;
+            background: #1E1E1E;
+            color: #ffffff;
+        }
+        /* Container styles */
+#totalsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: black;
+    border: 2px solid #FFD500;
+    border-radius: 10px;
+    padding: 15px;
+    width:80%;
+    max-width: 800px;
+  
+    margin: 20px auto;
+    box-shadow: 0 0 10px rgba(255, 213, 0, 0.5);
+}
+
+/* Box styles */
+.total-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-box h4 {
+    font-size: 18px;
+    color: white;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+}
+
+.total-box p {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Specific color styles */
+#totalAmount p {
+    color: #00FF00; /* Green */
+}
+
+#totalReceived p {
+    color: #FF0000; /* Red */
+}
+#pendingAmount {
+  color: #00FF00; /* Green */
+  font-family: 'Arial', sans-serif;
+   font-size: 20px;
+    font-weight: bold;
+}
+#totalDiscount p {
+    color: #FFD500; /* Yellow */
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+    #totalsContainer {
+        width: 80%;
+    }
+
+    .total-box h4, .total-box p {
+        font-size: 16px;
+    }
+}
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .actions .btn {
+            flex: 1;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <div><strong id="clientName">Client Name</strong></div>
+            <div id="clientPhone">Phone: --</div>
+            <div id="clientPlace">Place: --</div>
+        </div>
+        <div id="pendingAmount">₹0</div>
+    </div>
+<div class="filter-options">
+    <label for="filterType">Filter: </label>
+    <select id="filterType">
+        <option value="all">Show All</option>
+        <option value="workDetails">Work Details</option>
+        <option value="paymentReceived">Payment Received</option>
+        <option value="discount">Discount</option>
+    </select>
+</div>
+<div class="totals-container" id="totalsContainer">
+    <div class="total-box" id="totalAmount">
+        <h4>Amount</h4>
+        <p>₹0.00</p>
+    </div>
+    <div class="total-box" id="totalReceived">
+        <h4>Received</h4>
+        <p>₹0.00</p>
+    </div>
+    <div class="total-box" id="totalDiscount">
+        <h4>Discount</h4>
+        <p>₹0.00</p>
+    </div>
+</div>
+    <div class="container">
+        <div id="details"></div>
+    </div>
+
+    <div class="fixed-buttons">
+        <button class="btn btn-to-get" id="toGetBtn">To Get</button>
+      <div class="mic-button">
+    <i class="fas fa-microphone"></i>
+</div>
+
+        <button class="btn btn-received" id="receivedBtn">Received</button>
+    </div>
+<div id="details" class="card-container"></div>
+    <div class="popup" id="popupForm">
+        <div class="tabs">
+            <div class="tab active" id="jcbTab">JCB</div>
+            <div class="tab" id="tipperTab">Tipper</div>
+        </div>
+        <div id="jcbForm">
+<div class="form-group">
+    <label>Date and Time</label>
+    <div class="date-time-container">
+        <input type="date" id="jcbDate" value="${new Date().toISOString().split('T')[0]}">
+        <input type="time" id="jcbTime">
+    </div>
+</div>
+            <div class="form-group">
+                <label for="starting">Starting</label>
+                <input type="number" step="0.01" id="starting">
+            </div>
+            <div class="form-group">
+                <label for="ending">Ending</label>
+                <input type="number" step="0.01" id="ending">
+            </div>
+            <div class="form-group">
+                <label for="rate">Rate</label>
+                <input type="number" id="rate">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="shifting"> Shifting
+                </label>
+            </div>
+            <div class="form-group" id="shiftingAmountGroup" style="display: none;">
+                <label for="shiftingAmount">Shifting Amount</label>
+                <input type="number" id="shiftingAmount">
+            </div>
+        </div>
+        <div id="tipperForm" style="display: none;">
+<div class="form-group">
+    <label>Date and Time</label>
+    <div class="date-time-container">
+        <input type="date" id="tipperDate" value="${new Date().toISOString().split('T')[0]}">
+        <input type="time" id="tipperTime">
+    </div>
+</div>
+            <div class="form-group">
+                <label for="load">Load</label>
+                <input type="number" id="load">
+            </div>
+            <div class="form-group">
+                <label for="remarks">Remarks</label>
+                <textarea id="remarks"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount">
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn" id="submitBtn">Submit</button>
+            <button class="btn" id="cancelBtn">Cancel</button>
+        </div>
+    </div>
+<div class="popup" id="receivedPopupForm">
+    <div class="tabs">
+        <div class="tab active" id="paymentTab">Payment</div>
+        <div class="tab" id="discountTab">Discount</div>
+    </div>
+    <div id="paymentForm">
+        <div class="form-group">
+            <label>Date and Time</label>
+            <div class="date-time-container">
+                <input type="date" id="paymentDate" value="${new Date().toISOString().split('T')[0]}">
+                <input type="time" id="paymentTime">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="paymentAmount">Amount</label>
+            <input type="number" id="paymentAmount">
+        </div>
+        <div class="form-group">
+            <label for="paymentRemarks">Remarks</label>
+            <textarea id="paymentRemarks"></textarea>
+        </div>
+    </div>
+    <div id="discountForm" style="display: none;">
+        <div class="form-group">
+            <label>Date and Time</label>
+            <div class="date-time-container">
+                <input type="date" id="discountDate" value="${new Date().toISOString().split('T')[0]}">
+                <input type="time" id="discountTime">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="discountAmount">Amount</label>
+            <input type="number" id="discountAmount">
+        </div>
+        <div class="form-group">
+            <label for="discountRemarks">Remarks</label>
+            <textarea id="discountRemarks"></textarea>
+        </div>
+    </div>
+    <div class="actions">
+        <button class="btn" id="submitReceivedBtn">Submit</button>
+        <button class="btn" id="cancelReceivedBtn">Cancel</button>
+    </div>
+</div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDCjhSeMR3MhCvm-OMqqUeGk8X7DQjeDF4",
+        authDomain: "al-ameen-c9a84.firebaseapp.com",
+        databaseURL: "https://al-ameen-c9a84-default-rtdb.firebaseio.com/",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        const popupForm = document.getElementById('popupForm');
+        const toGetBtn = document.getElementById('toGetBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const jcbTab = document.getElementById('jcbTab');
+        const tipperTab = document.getElementById('tipperTab');
+        const jcbForm = document.getElementById('jcbForm');
+        const tipperForm = document.getElementById('tipperForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const details = document.getElementById('details');
+        const shiftingCheckbox = document.getElementById('shifting');
+        const shiftingAmountGroup = document.getElementById('shiftingAmountGroup');
+
+        shiftingCheckbox.addEventListener('change', () => {
+            shiftingAmountGroup.style.display = shiftingCheckbox.checked ? 'block' : 'none';
+        });
+
+        toGetBtn.addEventListener('click', () => {
+            // Set current date in the date fields
+            const currentDate = new Date().toISOString().split('T')[0];
+            document.getElementById('jcbDate').value = currentDate;
+            document.getElementById('tipperDate').value = currentDate;
+
+            // Get current time in HH:MM format
+            const now = new Date();
+            const currentTime = now.toTimeString().split(':').slice(0, 2).join(':');
+
+            // Set default time in the time fields
+            document.getElementById('jcbTime').value = currentTime;
+            document.getElementById('tipperTime').value = currentTime;
+
+            // Show the popup form
+            popupForm.classList.add('active');
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            popupForm.classList.remove('active');
+        });
+
+        jcbTab.addEventListener('click', () => {
+            jcbTab.classList.add('active');
+            tipperTab.classList.remove('active');
+            jcbForm.style.display = 'block';
+            tipperForm.style.display = 'none';
+        });
+
+        tipperTab.addEventListener('click', () => {
+            tipperTab.classList.add('active');
+            jcbTab.classList.remove('active');
+            jcbForm.style.display = 'none';
+            tipperForm.style.display = 'block';
+        });
+
+        submitBtn.addEventListener('click', () => {
+            let data = {};
+            if (jcbTab.classList.contains('active')) {
+                const starting = parseFloat(document.getElementById('starting').value) || 0;
+                const ending = parseFloat(document.getElementById('ending').value) || 0;
+                const rate = parseFloat(document.getElementById('rate').value) || 0;
+                const shifting = shiftingCheckbox.checked;
+                const shiftingAmount = shifting ? parseFloat(document.getElementById('shiftingAmount').value) || 0 : 0;
+
+                // Calculate difference and total amount
+                const difference = ending - starting;
+                const totalAmount = difference * rate + shiftingAmount;
+
+                data = {
+                    type: 'JCB',
+                    date: document.getElementById('jcbDate').value,
+                    time: document.getElementById('jcbTime').value, // Add time
+                    starting,
+                    ending,
+                    difference,
+                    rate,
+                    shifting,
+                    shiftingAmount,
+                    totalAmount,
+                };
+            } else if (tipperTab.classList.contains('active')) {
+                const load = parseFloat(document.getElementById('load').value) || 0;
+                const amount = parseFloat(document.getElementById('amount').value) || 0;
+
+                // Calculate total amount
+                const totalAmount = load * amount;
+
+                data = {
+                    type: 'Tipper',
+                    date: document.getElementById('tipperDate').value,
+                    time: document.getElementById('tipperTime').value, // Add time
+                    load,
+                    remarks: document.getElementById('remarks').value || '',
+                    amount,
+                    totalAmount,
+                };
+            }
+
+            // Push data to Firebase
+            const clientRef = ref(database, `clients/${clientKey}/workDetails`);
+            push(clientRef, data);
+
+            // Reset form fields
+            document.getElementById('jcbDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('starting').value = '';
+            document.getElementById('ending').value = '';
+            document.getElementById('rate').value = '';
+            shiftingCheckbox.checked = false;
+            document.getElementById('shiftingAmount').value = '';
+            document.getElementById('shiftingAmountGroup').style.display = 'none';
+
+            document.getElementById('tipperDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('load').value = '';
+            document.getElementById('remarks').value = '';
+            document.getElementById('amount').value = '';
+
+            // Close popup
+            popupForm.classList.remove('active');
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientKey = urlParams.get('key');
+
+        const clientRef = ref(database, `clients/${clientKey}`);
+        // Closing of the onValue function and other functions
+        onValue(clientRef, (snapshot) => {
+    const client = snapshot.val();
+    document.getElementById('clientName').innerText = client.name || '';
+    document.getElementById('clientPhone').innerText = client.phone || '';
+    document.getElementById('clientPlace').innerText = client.place || '';
+    details.innerHTML = '';
+
+    const allEntries = [];
+    // Initialize totals
+let totalAmount = 0;
+let totalReceived = 0;
+let totalDiscount = 0;
+
+    if (client.workDetails) {
+    Object.entries(client.workDetails).forEach(([key, work]) => {
+        allEntries.push({ ...work, key, category: 'workDetails' });
+    });
+}
+
+    if (client.paymentReceived) {
+    Object.entries(client.paymentReceived).forEach(([key, payment]) => {
+        allEntries.push({ ...payment, key, category: 'paymentReceived' });
+    });
+}
+
+if (client.discount) {
+    Object.entries(client.discount).forEach(([key, discount]) => {
+        allEntries.push({ ...discount, key, category: 'discount' });
+    });
+}
+
+// Calculate totals
+if (client.workDetails) {
+    Object.values(client.workDetails).forEach((work) => {
+        totalAmount += work.totalAmount || 0;
+    });
+}
+
+if (client.paymentReceived) {
+    Object.values(client.paymentReceived).forEach((payment) => {
+        totalReceived += payment.amount || 0;
+    });
+}
+
+if (client.discount) {
+    Object.values(client.discount).forEach((discount) => {
+        totalDiscount += discount.amount || 0;
+    });
+}
+// Calculate pending amount
+const pendingAmount = totalAmount - (totalReceived + totalDiscount);
+
+// Update pendingAmount in the header
+document.getElementById('pendingAmount').textContent = `₹${pendingAmount.toFixed(2)}`;
+
+// Optional: Log totals (for debugging)
+console.log({
+    totalAmount,
+    totalReceived,
+    totalDiscount,
+    pendingAmount
+});
+    // Sort entries by date and time (descending)
+    allEntries.sort((a, b) => {
+        const dateA = new Date(`${a.date}T${a.time || '00:00'}`);
+        const dateB = new Date(`${b.date}T${b.time || '00:00'}`);
+        return dateB - dateA;
+    });
+const renderCards = (filteredEntries) => {
+    details.innerHTML = '';
+    filteredEntries.forEach((entry) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+if (entry.category === 'workDetails') {
+            if (entry.type === 'JCB') {
+
+
+                // Card layout for JCB
+                card.innerHTML = `
+                    <div class="date">${entry.date || 'N/A'} - ${entry.time || 'N/A'}</div>
+                    <div class="left jcb-details">
+                        <div>
+                            Starting: <span>${entry.starting || 'N/A'}</span>
+                            _________________Ending: <span>${entry.ending || 'N/A'}</span>
+                        </div>
+                        <div class="highlight">Hour: <span>${entry.difference ? entry.difference.toFixed(2) : 'N/A'}</span></div>
+                        <div>Rate: ₹<span>${entry.rate || 'N/A'}</span></div>
+                        ${entry.shifting ? `<div>Shifting: ₹<span>${entry.shiftingAmount || 0}</span></div>` : ''}
+                    </div>
+                    <div class="right">₹${entry.totalAmount ? entry.totalAmount.toFixed(2) : 'N/A'}</div>
+                `;
+            } else if (entry.type === 'Tipper') {
+                // Card layout for Tipper
+                card.innerHTML = `
+                    <div class="date">${entry.date || 'N/A'} - ${entry.time || 'N/A'}</div>
+                    <div class="left tipper-details">
+                        <div class="highlight">Load: <span>${entry.load || 'N/A'}</span></div>
+                        <div>Remarks: <span>${entry.remarks || 'N/A'}</span></div>
+                        <div>Amount per Load: ₹<span>${entry.amount || 'N/A'}</span></div>
+                    </div>
+                    <div class="right">₹${entry.totalAmount ? entry.totalAmount.toFixed(2) : 'N/A'}</div>
+                `;
+            }
+
+            // Add double-click event to open details in new page
+            card.addEventListener('click', () => {
+    // Prepare data for redirection
+    const entryKey = entry.key || ''; // Ensure entry has a unique key
+    window.location.href = `details.html?clientKey=${clientKey}&entryKey=${entryKey}`;
+});
+        } else if (entry.category === 'paymentReceived') {
+            card.innerHTML = `
+                <div class="date">${entry.date || 'N/A'} - ${entry.time || 'N/A'}</div>
+                <div class="left">
+                    <div>Remarks: <span>${entry.remarks || 'N/A'}</span></div>
+                </div>
+                <div class="right" style="color: red;">₹${entry.amount ? entry.amount.toFixed(2) : 'N/A'}</div>
+            `;
+            card.addEventListener('click', () => {
+    // Prepare data for redirection
+    const entryKey = entry.key || ''; // Ensure entry has a unique key
+    window.location.href = `details.html?clientKey=${clientKey}&entryKey=${entryKey}`;
+});
+        } else if (entry.category === 'discount') {
+            card.innerHTML = `
+                <div class="date">${entry.date || 'N/A'} - ${entry.time || 'N/A'}</div>
+                <div class="left">
+                    <div>Remarks: <span>${entry.remarks || 'N/A'}</span></div>
+                </div>
+                <div class="right" style="color: gold;">₹${entry.amount ? entry.amount.toFixed(2) : 'N/A'}</div>
+            `;
+            card.addEventListener('click', () => {
+    // Prepare data for redirection
+    const entryKey = entry.key || ''; // Ensure entry has a unique key
+    window.location.href = `details.html?clientKey=${clientKey}&entryKey=${entryKey}`;
+});
+        }
+
+        details.appendChild(card);
+    });
+};
+
+    // Initial render (Show all cards)
+    renderCards(allEntries);
+    // Update totals in the DOM
+document.getElementById('totalAmount').querySelector('p').textContent = `₹${totalAmount.toFixed(2)}`;
+document.getElementById('totalReceived').querySelector('p').textContent = `₹${totalReceived.toFixed(2)}`;
+document.getElementById('totalDiscount').querySelector('p').textContent = `₹${totalDiscount.toFixed(2)}`;
+
+    // Filter functionality
+    document.getElementById('filterType').addEventListener('change', (e) => {
+        const filterValue = e.target.value;
+        if (filterValue === 'all') {
+            renderCards(allEntries);
+        } else {
+            const filteredEntries = allEntries.filter((entry) => entry.category === filterValue);
+            renderCards(filteredEntries);
+        }
+    });
+});
+
+        // Received data form handling
+        const receivedPopupForm = document.getElementById('receivedPopupForm');
+        const receivedBtn = document.getElementById('receivedBtn');
+        const cancelReceivedBtn = document.getElementById('cancelReceivedBtn');
+        const paymentTab = document.getElementById('paymentTab');
+        const discountTab = document.getElementById('discountTab');
+        const paymentForm = document.getElementById('paymentForm');
+        const discountForm = document.getElementById('discountForm');
+        const submitReceivedBtn = document.getElementById('submitReceivedBtn');
+
+        receivedBtn.addEventListener('click', () => {
+            const now = new Date();
+            const currentDate = now.toISOString().split('T')[0];
+            const currentTime = now.toTimeString().split(':').slice(0, 2).join(':');
+
+            document.getElementById('paymentDate').value = currentDate;
+            document.getElementById('paymentTime').value = currentTime;
+            document.getElementById('discountDate').value = currentDate;
+            document.getElementById('discountTime').value = currentTime;
+
+            receivedPopupForm.classList.add('active');
+        });
+
+        cancelReceivedBtn.addEventListener('click', () => {
+            receivedPopupForm.classList.remove('active');
+        });
+
+        paymentTab.addEventListener('click', () => {
+            paymentTab.classList.add('active');
+            discountTab.classList.remove('active');
+            paymentForm.style.display = 'block';
+            discountForm.style.display = 'none';
+        });
+
+        discountTab.addEventListener('click', () => {
+            discountTab.classList.add('active');
+            paymentTab.classList.remove('active');
+            paymentForm.style.display = 'none';
+            discountForm.style.display = 'block';
+        });
+
+         submitReceivedBtn.addEventListener('click', () => {
+    let data = {};
+    let nodePath = '';
+
+    if (paymentTab.classList.contains('active')) {
+        data = {
+            type: 'Payment',
+            date: document.getElementById('paymentDate').value,
+            time: document.getElementById('paymentTime').value,
+            amount: parseFloat(document.getElementById('paymentAmount').value) || 0,
+            remarks: document.getElementById('paymentRemarks').value || '',
+        };
+        nodePath = 'paymentReceived';
+    } else if (discountTab.classList.contains('active')) {
+        data = {
+            type: 'Discount',
+            date: document.getElementById('discountDate').value,
+            time: document.getElementById('discountTime').value,
+            amount: parseFloat(document.getElementById('discountAmount').value) || 0,
+            remarks: document.getElementById('discountRemarks').value || '',
+        };
+        nodePath = 'discount';
+    }
+
+    // Save data to Firebase
+    const clientRef = ref(database, `clients/${clientKey}/${nodePath}`);
+    push(clientRef, data);
+
+    // Clear form inputs after submission
+    if (paymentTab.classList.contains('active')) {
+        document.getElementById('paymentDate').value = '';
+        document.getElementById('paymentTime').value = '';
+        document.getElementById('paymentAmount').value = '';
+        document.getElementById('paymentRemarks').value = '';
+    } else if (discountTab.classList.contains('active')) {
+        document.getElementById('discountDate').value = '';
+        document.getElementById('discountTime').value = '';
+        document.getElementById('discountAmount').value = '';
+        document.getElementById('discountRemarks').value = '';
+    }
+
+    // Close the popup form
+    receivedPopupForm.classList.remove('active');
+});
+    });
+</script>
+
+
+</body>
+</html>

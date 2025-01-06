@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCB Business Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            padding: 15px;
+            text-align: center;
+            background-color: #1e1e1e;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            display: none;
+            overflow-y: auto;
+            margin-bottom: 80px;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #1e1e1e;
+            border-top: 1px solid #333;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            z-index: 10;
+        }
+
+        .bottom-nav .nav-item {
+            text-align: center;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .bottom-nav .nav-item i {
+            font-size: 22px;
+        }
+
+        .bottom-nav .nav-item p {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .bottom-nav .nav-item.active i, 
+        .bottom-nav .nav-item.active p {
+            color: #1db954;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #1db954;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+
+        .fab i {
+            color: white;
+            font-size: 24px;
+        }
+
+        .popup-form {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            display: none;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .popup-content h2 {
+            color: #1db954;
+            margin-bottom: 10px;
+        }
+
+        .popup-content p {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+
+        form input {
+            width: 90%;
+            margin-bottom: 15px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #333;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-actions button {
+            width: 48%;
+            padding: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            background-color: #ff4d4d;
+            color: #fff;
+        }
+
+        .submit-btn {
+            background-color: #1db954;
+            color: #fff;
+        }
+
+        .client-list {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 10px;
+        }
+        /* Status Label Icon */
+.status-icon {
+    font-size: 16px;
+}
+.result-published-container {
+    display: flex;
+    justify-content: space-between; /* Ensure space between the label and count */
+    align-items: center;
+    background-color: #00509D; /* Blue background */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.total-pendding-card {
+    display: flex;
+    justify-content: space-between;
+    width: 100%; /* Ensure full width usage */
+}
+
+.total-pendding-label {
+    font-size: 24px;
+    
+}
+
+.pendding-amount {
+    font-size: 24px;
+}
+
+
+        .client-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2c2c2c;
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            min-height: 80px;
+            max-height: 80px;
+        }
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #3faffa;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            opacity: 1;
+            animation: fadeOut 3s forwards;
+        }
+
+        .client-card .client-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .client-card .client-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #1db954;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+        }
+        #searchWrapper {
+    position: relative;
+    width: 90%;
+    margin: 20px auto;
+}
+
+#searchClient {
+    width: 100%;
+    padding: 10px 40px 10px 15px; /* Adjust padding to make space for the icon */
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    background-color: #2c2c2c;
+    color: #fff;
+}
+
+#searchWrapper i {
+    position: absolute;
+    right: 25px; /* Adjust position to align icon correctly */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: #aaa;
+    pointer-events: none;
+}
+        #searchClient {
+            width: 90%;
+            padding: 10px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+        .client-card .client-details p {
+            margin: 2px 0;
+            font-size: 14px;
+        }
+
+        .client-card .pending-amount {
+            font-size: 18px;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>JCB Business Control</header>
+
+    <div id="transactions" class="content active">
+        <h2>Transactions</h2>
+    </div>
+
+    <div id="clients" class="content">
+        <h2>Clients</h2>
+            <div class="result-published-container">
+        <div class="total-pendding-card">
+            <span class="total-pendding-label">Total pendding</span>
+            <span id="pendding-amount-count" class="pendding-amount">0677</span>
+        </div>
+    </div>
+    
+<div id="searchWrapper">
+    <input type="text" id="searchClient" placeholder="Search clients by name or place...">
+    <i class="fas fa-search"></i>
+</div>
+        <div id="clientList" class="client-list"></div>
+        <div class="fab" id="addClientFab">
+            <i class="fas fa-plus"></i>
+        </div>
+    </div>
+
+    <div id="settings" class="content">
+        <h2>Settings</h2>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" data-target="transactions">
+            <i class="fas fa-money-check-alt"></i>
+            <p>Transactions</p>
+        </div>
+        <div class="nav-item" data-target="clients">
+            <i class="fas fa-users"></i>
+            <p>Clients</p>
+        </div>
+        <div class="nav-item" data-target="settings">
+            <i class="fas fa-cogs"></i>
+            <p>Settings</p>
+        </div>
+    </div>
+
+    <!-- Popup Form for Adding/Updating Client -->
+    <div class="popup-form" id="clientForm">
+        <div class="popup-content">
+            <h2 id="formTitle">Add Client</h2>
+            <p id="formSubtitle">Fill out the details below.</p>
+            <form id="addClientForm">
+                <input type="text" id="clientName" placeholder="Client Name" required>
+                <input type="text" id="clientPlace" placeholder="Client Place" required>
+                <input type="tel" id="clientPhone" placeholder="Client Phone" required>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" id="cancelForm">Cancel</button>
+                    <button type="submit" class="submit-btn" id="submitClient">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Popup for Update/Delete Options -->
+    <div class="popup-form" id="actionPopup" style="display: none;">
+        <div class="popup-content">
+            <h2>Client Actions</h2>
+            <div class="form-actions">
+                <button class="submit-btn" id="updateClient">Update</button>
+                <button class="cancel-btn" id="deleteClient">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getDatabase, ref, push, update, remove, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDCjhSeMR3MhCvm-OMqqUeGk8X7DQjeDF4",
+            authDomain: "al-ameen-c9a84.firebaseapp.com",
+            databaseURL: "https://al-ameen-c9a84-default-rtdb.firebaseio.com/",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.content');
+
+        // Navigation
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                sections.forEach(section => section.classList.remove('active'));
+
+                item.classList.add('active');
+                document.getElementById(item.dataset.target).classList.add('active');
+            });
+        });
+
+        const addClientFab = document.getElementById('addClientFab');
+        const clientForm = document.getElementById('clientForm');
+        const actionPopup = document.getElementById('actionPopup');
+        const cancelForm = document.getElementById('cancelForm');
+        const submitClient = document.getElementById('submitClient');
+        const clientList = document.getElementById('clientList');
+        const searchClient = document.getElementById('searchClient');
+
+        let selectedClientKey = null;
+
+        addClientFab.addEventListener('click', () => {
+            clientForm.style.display = 'block';
+            selectedClientKey = null;
+            document.getElementById('formTitle').innerText = 'Add Client';
+        });
+
+        cancelForm.addEventListener('click', () => {
+            clientForm.style.display = 'none';
+            document.getElementById('addClientForm').reset();
+        });
+
+        submitClient.addEventListener('click', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('clientName').value;
+            const place = document.getElementById('clientPlace').value;
+            const phone = document.getElementById('clientPhone').value;
+            const timestamp = new Date().toISOString();
+
+            if (!name || !place || !phone) {
+                showNotification('All fields are required!');
+                return;
+            }
+
+            if (selectedClientKey) {
+                const clientRef = ref(database, `clients/${selectedClientKey}`);
+                update(clientRef, { name, place, phone }).then(() => {
+                    showNotification('Client updated successfully!');
+                    clientForm.style.display = 'none';
+                    document.getElementById('addClientForm').reset();
+                });
+            } else {
+                const clientsRef = ref(database, 'clients');
+                push(clientsRef, { name, place, phone, timestamp }).then(() => {
+                    showNotification('Client added successfully!');
+                    clientForm.style.display = 'none';
+                    document.getElementById('addClientForm').reset();
+                });
+            }
+        });
+
+        const clientsRef = ref(database, 'clients');
+
+        onValue(clientsRef, (snapshot) => {
+            const clients = [];
+            snapshot.forEach(childSnapshot => {
+                const client = { key: childSnapshot.key, ...childSnapshot.val() };
+                clients.push(client);
+            });
+
+            clients.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            clientList.innerHTML = '';
+            clients.forEach(client => {
+                const clientCard = document.createElement('div');
+                clientCard.className = 'client-card';
+
+                clientCard.innerHTML = `
+                    <div class="client-info">
+                        <div class="client-icon">${client.name.charAt(0).toUpperCase()}</div>
+                        <div class="client-details">
+                            <p><strong>${client.name}</strong></p>
+                            <p>${client.place}</p>
+                            <p>${client.phone}</p>
+                        </div>
+                    </div>
+                    <div class="pending-amount">₹0</div>
+                `;
+
+                clientCard.addEventListener('click', () => {
+                    location.href = `client.html?key=${client.key}`;
+                });
+
+                clientCard.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    selectedClientKey = client.key;
+                    actionPopup.style.display = 'block';
+                });
+
+                clientList.appendChild(clientCard);
+            });
+        });
+
+        const updateClient = document.getElementById('updateClient');
+        const deleteClient = document.getElementById('deleteClient');
+
+        updateClient.addEventListener('click', () => {
+            const clientRef = ref(database, `clients/${selectedClientKey}`);
+            clientForm.style.display = 'block';
+            actionPopup.style.display = 'none';
+
+            onValue(clientRef, (snapshot) => {
+                const client = snapshot.val();
+                document.getElementById('clientName').value = client.name;
+                document.getElementById('clientPlace').value = client.place;
+                document.getElementById('clientPhone').value = client.phone;
+                document.getElementById('formTitle').innerText = 'Update Client';
+            }, { onlyOnce: true });
+        });
+
+        deleteClient.addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete this client?')) {
+                const clientRef = ref(database, `clients/${selectedClientKey}`);
+                remove(clientRef).then(() => {
+                    showNotification('Client deleted successfully!');
+                    actionPopup.style.display = 'none';
+                });
+            }
+        });
+
+        searchClient.addEventListener('input', () => {
+            const searchQuery = searchClient.value.toLowerCase();
+            const clientCards = document.querySelectorAll('.client-card');
+
+            clientCards.forEach(card => {
+                const clientName = card.querySelector('.client-details p').textContent.toLowerCase();
+                const clientPlace = card.querySelector('.client-details p').textContent.toLowerCase();
+
+                if (clientName.includes(searchQuery) || clientPlace.includes(searchQuery)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Show Notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
