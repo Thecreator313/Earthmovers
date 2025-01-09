@@ -505,18 +505,19 @@ input[type="checkbox"] {
             const rate = parseFloat(document.getElementById("editRate").value);
             const shifting = document.getElementById("editShifting").checked;
             const shiftingAmount = shifting ? parseFloat(document.getElementById("editShiftingAmount").value) : 0;
+updates = {
+    date: document.getElementById("editDate").value,
+    time: document.getElementById("editTime").value,
+    starting,
+    ending,
+    rate,
+    shifting,
+    shiftingAmount,
+    difference: parseFloat((ending - starting).toFixed(2)), // Restrict to 2 decimal places
+    totalAmount: parseFloat(((ending - starting) * rate + shiftingAmount).toFixed(2)), // Restrict to 2 decimal places
+};
 
-            updates = {
-                date: document.getElementById("editDate").value,
-                time: document.getElementById("editTime").value,
-                starting,
-                ending,
-                rate,
-                shifting,
-                shiftingAmount,
-                difference: ending - starting,
-                totalAmount: (ending - starting) * rate + shiftingAmount,
-            };
+            
         } else if (entry.type === "Tipper") {
             const load = parseFloat(document.getElementById("editLoad").value);
             const amount = parseFloat(document.getElementById("editAmount").value);
@@ -680,7 +681,6 @@ shareWhatsAppButton.addEventListener("click", async () => {
 });
 
 function generateInvoiceFromUI() {
-    // Get entry details from the UI
     const typeElement = document.querySelector(".content .type");
     const amountElement = document.querySelector(".content .amount");
     const dateTimeElement = document.querySelector(".content .date_and_time");
@@ -693,103 +693,138 @@ function generateInvoiceFromUI() {
     const clientName = clientNameElement.textContent || "Unknown Client";
     const additionalInfoHtml = additionalInfoDiv.innerHTML;
 
-    // Generate the invoice canvas
+    // Parse additional details from innerHTML
+    const additional = {};
+    additionalInfoHtml.replace(/<p><strong>([^:]+):<\/strong>\s?([^<]+)<\/p>/g, (_, key, value) => {
+        additional[key.toLowerCase()] = value.trim();
+    });
+
     const canvas = document.getElementById("invoiceCanvas");
     const ctx = canvas.getContext("2d");
 
     // Set canvas dimensions
-    canvas.width = 600;
-    canvas.height = 600;
+    canvas.width = 800;
+    canvas.height = 1000;
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Add background
-    ctx.fillStyle = "#f4f4f9";
+    // Background with gradient
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    gradient.addColorStop(0, "#f0f4fc");
+    gradient.addColorStop(1, "#d9e9f9");
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Header
     ctx.fillStyle = "#00509d";
-    ctx.fillRect(0, 0, canvas.width, 80);
+    ctx.fillRect(0, 0, canvas.width, 100);
     ctx.fillStyle = "#fff";
-    ctx.font = "30px Roboto";
-    ctx.fillText("Invoice", 20, 50);
+    ctx.font = "bold 30px 'Poppins'";
+    ctx.fillText("AL AMEEN EARTHMOVERS", 30, 60);
 
-    // Client and Date Details
-     // Client and Details Section
+    // Invoice Title
+    ctx.fillStyle = "#f4f4f9";
+    ctx.font = "24px 'Roboto'";
+    ctx.fillText("Invoice", canvas.width - 150, 60);
+
+    // Client Details Section
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(20, 120, canvas.width - 40, 150);
     ctx.fillStyle = "#000";
-    ctx.font = "20px Roboto";
-    ctx.fillText(`Client: ${clientName}`, 20, 120);
-    ctx.fillText(`Type: ${type}`, 20, 160);
-    ctx.fillText(`Date & Time: ${dateTime}`, 20, 200);
-    // Draw Thin Line
-    ctx.strokeStyle = "#ccc";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(20, 220);
-    ctx.lineTo(canvas.width - 20, 220);
-    ctx.stroke();
-    // Show Amount
-    let amountColor = "#008000"; // Default Green
-    if (type === "Discount") {
-        amountColor = "#FFD700"; // Gold
-    } else if (type === "Payment") {
-        amountColor = "#FF0000"; // Red
-    }
+    ctx.font = "18px 'Poppins'";
+    ctx.fillText("Client Details", 40, 150);
+    ctx.fillText(`Name: ${clientName}`, 40, 180);
+    ctx.fillText(`Date & Time: ${dateTime}`, 40, 210);
 
-    ctx.fillStyle = amountColor;
-    ctx.font = "40px Roboto Bold";
-    ctx.textAlign = "right";
-    ctx.fillText(`₹${amount}`, canvas.width - 20, 160); // Amount on the right side
-    ctx.textAlign = "start"; // Reset alignment
+    ctx.fillStyle = "#00509d";
+    ctx.fillText("Invoice Details", 400, 150);
+    ctx.fillStyle = "#000";
+    ctx.fillText(`Type: ${type}`, 400, 180);
+    ctx.fillText(`Amount: ₹${amount}`, 400, 210);
+
+    // Summary Section
+    ctx.fillStyle = "#003F88";
+    ctx.fillRect(20, 300, canvas.width - 40, 50);
+    ctx.fillStyle = "#fff";
+    ctx.font = "20px 'Roboto'";
+    ctx.fillText("Summary", 30, 335);
+
+    // Table Headers
+    ctx.fillStyle = "#ddd";
+    ctx.fillRect(20, 360, canvas.width - 40, 30);
+    ctx.fillStyle = "#000";
+    ctx.font = "16px 'Roboto'";
+    ctx.fillText("Description", 40, 380);
+    ctx.fillText("Quantity", 300, 380);
+    ctx.fillText("Price", 500, 380);
+
+    // Populate Rows Based on Type
+    let y = 410;
+
+    if (type === "JCB") {
+        // Row 1: Working Time
+        const difference = parseFloat(additional["difference"] || 0).toFixed(2);
+        const rate = parseFloat(additional["rate"] || 0).toFixed(2);
+        const workingTimePrice = (difference * rate).toFixed(2);
+
+        ctx.fillStyle = "#000";
+        ctx.fillText("Working Time", 40, y);
+        ctx.fillText(difference, 300, y);
+        ctx.fillText(`₹${workingTimePrice}`, 500, y);
+        y += 30;
+
+        // Row 2: Shifting (if applicable)
+        if (additional["shifting amount"]) {
+            const shiftingAmount = parseFloat(additional["shifting amount"] || 0).toFixed(2);
+
+            ctx.fillText("Shifting", 40, y);
+            ctx.fillText("N/A", 300, y);
+            ctx.fillText(`₹${shiftingAmount}`, 500, y);
+            y += 30;
+        }
+    } else if (type === "Tipper") {
+        // Row 1: Tipper
+        const load = parseFloat(additional["load"] || 0).toFixed(2);
+        const amountPerLoad = parseFloat(additional["amount"] || 0).toFixed(2);
+        const tipperPrice = (load * amountPerLoad).toFixed(2);
+
+        ctx.fillStyle = "#000";
+        ctx.fillText("Tipper", 40, y);
+        ctx.fillText(load, 300, y);
+        ctx.fillText(`₹${tipperPrice}`, 500, y);
+        y += 30;
+    }
+    // Total Amount
+    ctx.fillStyle = "#00509d";
+    ctx.fillRect(20, y + 20, canvas.width - 40, 50);
+    ctx.fillStyle = "#fff";
+    ctx.font = "18px 'Poppins'";
+    ctx.fillText("Total", 40, y + 50);
+    ctx.font = "24px 'Roboto'";
+    ctx.fillText(`₹${amount}`, canvas.width - 150, y + 50);
 
     // Additional Information
-    ctx.fillStyle = "#003F88"; // Blue color for the subheading
-    ctx.font = "25px Roboto Bold"; // Bold font for subheading
-    ctx.fillText("Additional Information", 20, 260);
-
-    ctx.fillStyle = "#000"; // Black color for content
-ctx.font = "20px Roboto"; // Bold
+    ctx.fillStyle = "#f4f4f9";
+    ctx.fillRect(20, y + 100, canvas.width - 40, 100);
+    ctx.fillStyle = "#000";
+    ctx.font = "16px 'Roboto'";
+    ctx.fillText("Additional Information:", 30, y + 130);
     const additionalInfoLines = additionalInfoHtml.replace(/<\/?[^>]+(>|$)/g, "").split("\n");
     additionalInfoLines.forEach((line, index) => {
-        ctx.fillText(line.trim(), 20, 300 + index * 30);
+        ctx.fillText(line.trim(), 30, y + 160 + index * 20);
     });
-
     // Footer
-    const footerHeight = 100; // Increased height
-    const footerY = canvas.height - footerHeight;
-
-    // Footer Background
     ctx.fillStyle = "#003F88";
-    ctx.fillRect(0, footerY, canvas.width, footerHeight);
-
-    // Left Side: Text
-    ctx.fillStyle = "#FFD500";
-    ctx.font = "28px Roboto Bold";
-    ctx.fillText("AL AMEEN", 20, footerY + 40);
-    ctx.font = "18px Roboto";
-    ctx.fillText("EARTHMOVERS", 20, footerY + 70);
-
-    // Right Side: Phone Numbers with Icons
-    ctx.font = "16px Roboto";
-    const phoneNumbers = ["97444XXXXX", "81294XXXXX"];
-    phoneNumbers.forEach((number, index) => {
-        const x = canvas.width - 220; // Right-side alignment
-        const y = footerY + 35 + index * 25; // Spacing between numbers
-
-        // Draw phone icon (circle and line)
-        ctx.fillStyle = "#FFD500";
-        ctx.beginPath();
-        ctx.arc(x, y - 10, 8, 0, 2 * Math.PI); // Circle
-        ctx.fill();
-        ctx.fillStyle = "#003F88";
-        ctx.fillText("📞", x - 7, y - 5); // Emoji fallback
-
-        // Draw the phone number
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fillText(number, x + 20, y);
-    });
+    ctx.fillRect(0, canvas.height - 120, canvas.width, 120);
+    ctx.fillStyle = "#fff";
+    ctx.font = "20px 'Poppins'";
+    ctx.fillText("Thank you for your business!", 30, canvas.height - 80);
+    ctx.font = "16px 'Roboto'";
+    ctx.fillText("Contact us: 97444XXXXX | 81294XXXXX", 30, canvas.height - 50);
 }
+
+
 
 </script>
 
@@ -836,9 +871,7 @@ ctx.font = "20px Roboto"; // Bold
     </div>
 
 
-    <div class="share-entry">
-        <i class="fab fa-whatsapp"></i> SHARE ENTRY
-    </div>
+
     <div class="share-entry modern-button">
     <i class="fab fa-whatsapp"></i> Share Invoice
 </div>
