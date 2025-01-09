@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Report</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDCjhSeMR3MhCvm-OMqqUeGk8X7DQjeDF4",
+            authDomain: "al-ameen-c9a84.firebaseapp.com",
+            databaseURL: "https://al-ameen-c9a84-default-rtdb.firebaseio.com/",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Fetch client details on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const clientKey = urlParams.get('key');
+
+            if (!clientKey) {
+                document.getElementById('clientDetails').innerText = "Client key not provided!";
+                return;
+            }
+
+            const clientRef = ref(database, `clients/${clientKey}`);
+
+            onValue(clientRef, (snapshot) => {
+                const client = snapshot.val();
+                if (client) {
+                    // Display client details
+                    document.getElementById('clientName').innerText = client.name || 'N/A';
+                    document.getElementById('clientPhone').innerText = client.phone || 'N/A';
+                    document.getElementById('clientPlace').innerText = client.place || 'N/A';
+                } else {
+                    document.getElementById('clientDetails').innerText = "Client details not found!";
+                }
+            });
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .details {
+            margin-top: 20px;
+        }
+        .details p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .details span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Client Report</h1>
+        <div id="clientDetails" class="details">
+            <p>Client Name: <span id="clientName">Loading...</span></p>
+            <p>Client Phone: <span id="clientPhone">Loading...</span></p>
+            <p>Client Place: <span id="clientPlace">Loading...</span></p>
+        </div>
+    </div>
+</body>
+</html>
