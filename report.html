@@ -3,84 +3,447 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Report</title>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+    <title>Enhanced Client Report with Filters</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Modern Google-style fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDCjhSeMR3MhCvm-OMqqUeGk8X7DQjeDF4",
-            authDomain: "al-ameen-c9a84.firebaseapp.com",
-            databaseURL: "https://al-ameen-c9a84-default-rtdb.firebaseio.com/",
-        };
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #00296B, #00509D);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+        .container {
+            max-width: 700px;
+            width: 90%;
+            background: #1b1f24;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            color: #e0e0e0;
+        }
 
-        // Fetch client details on page load
-        document.addEventListener('DOMContentLoaded', function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const clientKey = urlParams.get('key');
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
 
-            if (!clientKey) {
-                document.getElementById('clientDetails').innerText = "Client key not provided!";
-                return;
+        .filter-group {
+            margin-bottom: 1.5rem;
+            background: #2a2f37;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-group label {
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #9ca3af;
+        }
+
+        select, input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.9rem;
+            background: #3a3f47;
+            color: #fff;
+            transition: 0.3s;
+        }
+
+        select:hover, input[type="date"]:hover {
+            background: #4a505a;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        input[type="radio"] {
+            margin: 0;
+            accent-color: #ffd500;
+            width: 18px;
+            height: 18px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #FDC500, #FFD500);
+            color: #121212;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 213, 0, 0.5);
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #ffd700, #fdd600);
+            box-shadow: 0 6px 16px rgba(255, 213, 0, 0.8);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
             }
 
-            const clientRef = ref(database, `clients/${clientKey}`);
-
-            onValue(clientRef, (snapshot) => {
-                const client = snapshot.val();
-                if (client) {
-                    // Display client details
-                    document.getElementById('clientName').innerText = client.name || 'N/A';
-                    document.getElementById('clientPhone').innerText = client.phone || 'N/A';
-                    document.getElementById('clientPlace').innerText = client.place || 'N/A';
-                } else {
-                    document.getElementById('clientDetails').innerText = "Client details not found!";
-                }
-            });
-        });
-    </script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .details {
-            margin-top: 20px;
-        }
-        .details p {
-            margin: 10px 0;
-            font-size: 16px;
-        }
-        .details span {
-            font-weight: bold;
+            .container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Client Report</h1>
-        <div id="clientDetails" class="details">
-            <p>Client Name: <span id="clientName">Loading...</span></p>
-            <p>Client Phone: <span id="clientPhone">Loading...</span></p>
-            <p>Client Place: <span id="clientPlace">Loading...</span></p>
+        <h1>Enhanced Client Report</h1>
+        <div class="filter-group">
+            <label for="typeFilter">Filter by Type</label>
+            <select id="typeFilter">
+                <option value="All">All Entries</option>
+                <option value="JCBTipper">JCB & Tipper</option>
+                <option value="Discount">Discount</option>
+                <option value="Payment">Payment</option>
+            </select>
         </div>
+      <div class="filter-group">
+    <label>Filter by Date</label>
+    <div class="radio-group">
+        <label>
+            <input type="radio" name="dateFilter" value="today" checked>
+            Today
+        </label>
+        <label>
+            <input type="radio" name="dateFilter" value="specific">
+            Choose a Date
+        </label>
+        <input type="date" id="specificDate" style="display: none;">
+        <label>
+            <input type="radio" name="dateFilter" value="range">
+            Set Duration
+        </label>
+        <div style="display: flex; gap: 10px;">
+            <input type="date" id="startDate" style="flex: 1; display: none;">
+            <input type="date" id="endDate" style="flex: 1; display: none;">
+        </div>
+        <label>
+            <input type="radio" name="dateFilter" value="allDates">
+            All Dates
+        </label>
     </div>
+</div>
+
+        <button id="generateReport">Generate Report</button>
+    </div>
+    <script>
+        document.querySelectorAll("input[name='dateFilter']").forEach(radio => {
+            radio.addEventListener("change", function () {
+                document.getElementById("specificDate").style.display = this.value === "specific" ? "block" : "none";
+                document.getElementById("startDate").style.display = this.value === "range" ? "block" : "none";
+                document.getElementById("endDate").style.display = this.value === "range" ? "block" : "none";
+            });
+        });
+    </script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script type="module">
+        // Firebase setup
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyDCjhSeMR3MhCvm-OMqqUeGk8X7DQjeDF4",
+            authDomain: "al-ameen-c9a84.firebaseapp.com",
+            databaseURL: "https://al-ameen-c9a84-default-rtdb.firebaseio.com/",
+        };
+        
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // DOM Ready
+        document.addEventListener("DOMContentLoaded", function () {
+            const clientKey = new URLSearchParams(window.location.search).get("key");
+            if (!clientKey) {
+                alert("Client key not provided!");
+                return;
+            }
+
+            document.getElementById("generateReport").addEventListener("click", function () {
+                loadClientDetails(clientKey);
+            });
+        });
+
+        function loadClientDetails(clientKey) {
+            const clientRef = ref(database, `clients/${clientKey}`);
+            onValue(clientRef, (snapshot) => {
+                const client = snapshot.val();
+                if (!client) {
+                    alert("Client details not found!");
+                    return;
+                }
+                const filters = getFilters();
+                generatePDF(client, filters);
+            });
+        }
+
+        function getFilters() {
+    const typeFilter = document.getElementById("typeFilter").value;
+    const dateFilter = document.querySelector("input[name='dateFilter']:checked").value;
+    let specificDate = null, startDate = null, endDate = null;
+
+    if (dateFilter === "specific") {
+        specificDate = document.getElementById("specificDate").value;
+    } else if (dateFilter === "range") {
+        startDate = document.getElementById("startDate").value;
+        endDate = document.getElementById("endDate").value;
+    }
+
+    return { typeFilter, dateFilter, specificDate, startDate, endDate };
+}
+
+async function generatePDF(client, filters) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+    let balance = 0;
+    let totalIncome = 0;
+    let totalPayment = 0;
+    const rows = [];
+    const entries = [];
+
+    // Collect and format data
+    if (client.workDetails) {
+        for (const key in client.workDetails) {
+            const work = client.workDetails[key];
+            const remarks = [];
+            if (work.type === "JCB") {
+                remarks.push(`Start: ${work.starting}, End: ${work.ending}`);
+                remarks.push(`Diff: ${work.difference}, Rate: ₹${work.rate}`);
+                if (work.shifting) {
+                    remarks.push(`Shift: ₹${work.shiftingAmount}`);
+                }
+            } else if (work.type === "Tipper") {
+                remarks.push(`Load: ${work.load}, Amount: ₹${work.amount}`);
+                remarks.push(`Remarks: ${work.remarks}`);
+            }
+            entries.push({
+                type: work.type,
+                datetime: new Date(`${work.date}T${work.time}`),
+                remarks, // Pass remarks as an array for multi-line support
+                income: work.totalAmount,
+                payment: 0
+            });
+        }
+    }
+
+    if (client.paymentReceived) {
+        for (const key in client.paymentReceived) {
+            const payment = client.paymentReceived[key];
+            entries.push({
+                type: "Payment",
+                datetime: new Date(`${payment.date}T${payment.time}`),
+                remarks: [payment.remarks], // Convert to array
+                income: 0,
+                payment: payment.amount
+            });
+        }
+    }
+
+    if (client.discount) {
+        for (const key in client.discount) {
+            const discount = client.discount[key];
+            entries.push({
+                type: "Discount",
+                datetime: new Date(`${discount.date}T${discount.time}`),
+                remarks: [discount.remarks], // Convert to array
+                income: 0,
+                payment: discount.amount
+            });
+        }
+    }
+
+    // Apply filters and sort entries
+    const today = new Date().toISOString().split("T")[0];
+    const filteredEntries = entries.filter(entry => {
+        if (filters.typeFilter === "JCBTipper") {
+            if (entry.type !== "JCB" && entry.type !== "Tipper") return false;
+        } else if (filters.typeFilter !== "All" && entry.type !== filters.typeFilter) return false;
+
+        const entryDate = entry.datetime.toISOString().split("T")[0];
+        if (filters.dateFilter === "today" && entryDate !== today) return false;
+        if (filters.dateFilter === "specific" && entryDate !== filters.specificDate) return false;
+        if (filters.dateFilter === "range" && (entryDate < filters.startDate || entryDate > filters.endDate)) return false;
+        if (filters.dateFilter === "allDates") return true; // Include all entries
+
+        return true;
+    });
+
+    filteredEntries.sort((a, b) => a.datetime - b.datetime);
+
+    // Calculate balances
+    filteredEntries.forEach(entry => {
+        if (entry.type === "JCB" || entry.type === "Tipper") {
+            totalIncome += entry.income;
+            balance += entry.income;
+        } else {
+            totalPayment += entry.payment;
+            balance -= entry.payment;
+        }
+        rows.push([
+            entry.datetime.toLocaleString(),
+            entry.remarks.join("\n"), // Convert remarks array to a multi-line string
+            entry.income ? `₹${entry.income.toFixed(2)}` : "-",
+            entry.payment ? `₹${entry.payment.toFixed(2)}` : "-",
+            `₹${balance.toFixed(2)}`
+        ]);
+    });
+
+    // Header Section
+    doc.setFontSize(24);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(40);
+    doc.text("Client Report", 105, 20, { align: "center" });
+
+    // Subheader
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Report Generated on: ${new Date().toLocaleDateString()}`, 105, 28, { align: "center" });
+
+    // Client Details Section
+    doc.setDrawColor(200);
+    doc.setLineWidth(0.5);
+    doc.rect(15, 35, 180, 30); // Border
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text("Client Details", 20, 42);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Name: ${client.name}`, 20, 49);
+    doc.text(`Phone: ${client.phone}`, 20, 56);
+    doc.text(`Place: ${client.place}`, 20, 63);
+
+    // Filter Information
+    const filterText = filters.dateFilter === "today" ? "Date: Today"
+        : filters.dateFilter === "specific" ? `Date: ${filters.specificDate}`
+        : filters.dateFilter === "range" ? `Date Range: ${filters.startDate} to ${filters.endDate}`
+        : "Date: All";
+    doc.text(filterText, 150, 49);
+
+    // Summary Section
+    const boxWidth = 60;
+    const boxHeight = 20;
+    const boxY = 75;
+
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+
+    // Total Income
+    doc.setFillColor(204, 255, 204);
+    doc.roundedRect(15, boxY, boxWidth, boxHeight, 3, 3, "FD");
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0);
+    doc.text("Total Income", 15 + boxWidth / 2, boxY + 8, { align: "center" });
+    doc.setFontSize(14);
+    doc.setTextColor(0, 150, 0);
+    doc.text(`₹${totalIncome.toFixed(2)}`, 15 + boxWidth / 2, boxY + 15, { align: "center" });
+
+    // Total Payment
+    doc.setFillColor(255, 204, 204);
+    doc.roundedRect(80, boxY, boxWidth, boxHeight, 3, 3, "FD");
+    doc.setFontSize(10);
+    doc.setTextColor(0);
+    doc.text("Total Payment", 80 + boxWidth / 2, boxY + 8, { align: "center" });
+    doc.setFontSize(14);
+    doc.setTextColor(200, 0, 0);
+    doc.text(`₹${totalPayment.toFixed(2)}`, 80 + boxWidth / 2, boxY + 15, { align: "center" });
+
+    // Net Balance
+    doc.setFillColor(224, 224, 224);
+    doc.roundedRect(145, boxY, boxWidth, boxHeight, 3, 3, "FD");
+    doc.setFontSize(10);
+    doc.setTextColor(0);
+    doc.text("Net Balance", 145 + boxWidth / 2, boxY + 8, { align: "center" });
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text(`₹${balance.toFixed(2)}`, 145 + boxWidth / 2, boxY + 15, { align: "center" });
+
+    // Table Section
+    doc.autoTable({
+        head: [["Date & Time", "Remarks", "Income", "Payment", "Balance"]],
+        body: rows,
+        theme: "grid",
+        startY: boxY + boxHeight + 10,
+        margin: { left: 15, right: 15 },
+        headStyles: {
+            fillColor: [41, 76, 112],
+            textColor: [255, 255, 255],
+            fontStyle: "bold",
+            fontSize: 12,
+        },
+        bodyStyles: {
+            fontSize: 10,
+            textColor: [40, 40, 40],
+            lineColor: [200, 200, 200],
+            cellPadding: 4,
+        },
+        alternateRowStyles: {
+            fillColor: [245, 245, 245],
+        },
+        columnStyles: {
+            0: { halign: "center", cellWidth: 35 }, // Date & Time
+            1: { halign: "left", cellWidth: 70 }, // Remarks
+            2: { halign: "right", cellWidth: 25 }, // Income
+            3: { halign: "right", cellWidth: 25 }, // Payment
+            4: { halign: "right", cellWidth: 30 }, // Balance
+        },
+    });
+
+    // Footer Section
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(120);
+        doc.text(`Page ${i} of ${pageCount}`, 105, 287, { align: "center" });
+        doc.text("This is a system-generated report.", 105, 293, { align: "center" });
+    }
+
+    // Preview PDF
+    const pdfBlob = doc.output("blob");
+    const pdfURL = URL.createObjectURL(pdfBlob);
+    window.open(pdfURL, "_blank");
+}
+
+
+
+
+
+    </script>
 </body>
 </html>
