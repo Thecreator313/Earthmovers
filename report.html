@@ -244,12 +244,12 @@ async function generatePDF(client, filters) {
             const remarks = [];
             if (work.type === "JCB") {
                 remarks.push(`Start: ${work.starting}, End: ${work.ending}`);
-                remarks.push(`Diff: ${work.difference}, Rate: ₹${work.rate}`);
+                remarks.push(`Diff: ${work.difference}, Rate: ${work.rate}`);
                 if (work.shifting) {
-                    remarks.push(`Shift: ₹${work.shiftingAmount}`);
+                    remarks.push(`Shift: ${work.shiftingAmount}`);
                 }
             } else if (work.type === "Tipper") {
-                remarks.push(`Load: ${work.load}, Amount: ₹${work.amount}`);
+                remarks.push(`Load: ${work.load}, Amount: ${work.amount}`);
                 remarks.push(`Remarks: ${work.remarks}`);
             }
             entries.push({
@@ -318,9 +318,9 @@ async function generatePDF(client, filters) {
         rows.push([
             entry.datetime.toLocaleString(),
             entry.remarks.join("\n"), // Convert remarks array to a multi-line string
-            entry.income ? `₹${entry.income.toFixed(2)}` : "-",
-            entry.payment ? `₹${entry.payment.toFixed(2)}` : "-",
-            `₹${balance.toFixed(2)}`
+            entry.income ? `${entry.income.toFixed(2)}` : "-",
+            entry.payment ? `${entry.payment.toFixed(2)}` : "-",
+            `${balance.toFixed(2)}`
         ]);
     });
 
@@ -371,7 +371,7 @@ async function generatePDF(client, filters) {
     doc.text("Total Income", 15 + boxWidth / 2, boxY + 8, { align: "center" });
     doc.setFontSize(14);
     doc.setTextColor(0, 150, 0);
-    doc.text(`₹${totalIncome.toFixed(2)}`, 15 + boxWidth / 2, boxY + 15, { align: "center" });
+    doc.text(`${totalIncome.toFixed(2)}`, 15 + boxWidth / 2, boxY + 15, { align: "center" });
 
     // Total Payment
     doc.setFillColor(255, 204, 204);
@@ -381,7 +381,7 @@ async function generatePDF(client, filters) {
     doc.text("Total Payment", 80 + boxWidth / 2, boxY + 8, { align: "center" });
     doc.setFontSize(14);
     doc.setTextColor(200, 0, 0);
-    doc.text(`₹${totalPayment.toFixed(2)}`, 80 + boxWidth / 2, boxY + 15, { align: "center" });
+    doc.text(`${totalPayment.toFixed(2)}`, 80 + boxWidth / 2, boxY + 15, { align: "center" });
 
     // Net Balance
     doc.setFillColor(224, 224, 224);
@@ -391,7 +391,7 @@ async function generatePDF(client, filters) {
     doc.text("Net Balance", 145 + boxWidth / 2, boxY + 8, { align: "center" });
     doc.setFontSize(14);
     doc.setTextColor(0);
-    doc.text(`₹${balance.toFixed(2)}`, 145 + boxWidth / 2, boxY + 15, { align: "center" });
+    doc.text(`${balance.toFixed(2)}`, 145 + boxWidth / 2, boxY + 15, { align: "center" });
 
     // Table Section
     doc.autoTable({
