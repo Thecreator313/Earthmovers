@@ -243,18 +243,18 @@ async function generatePDF(client, filters) {
             const work = client.workDetails[key];
             const remarks = [];
             if (work.type === "JCB") {
-                remarks.push(`Start: ${work.starting}, End: ${work.ending}`);
-                remarks.push(`Diff: ${work.difference}, Rate: ${work.rate}`);
+                remarks.push(Diff: ${work.difference}, Rate: ${work.rate});
+                remarks.push(Start: ${work.starting}, End: ${work.ending});
                 if (work.shifting) {
-                    remarks.push(`Shift: ${work.shiftingAmount}`);
+                    remarks.push(Shift: ${work.shiftingAmount});
                 }
             } else if (work.type === "Tipper") {
-                remarks.push(`Load: ${work.load}, Amount: ${work.amount}`);
-                remarks.push(`Remarks: ${work.remarks}`);
+                remarks.push(Load: ${work.load}, Amount: ${work.amount});
+                remarks.push(Remarks: ${work.remarks});
             }
             entries.push({
                 type: work.type,
-                datetime: new Date(`${work.date}T${work.time}`),
+                datetime: new Date(${work.date}T${work.time}),
                 remarks, // Pass remarks as an array for multi-line support
                 income: work.totalAmount,
                 payment: 0
@@ -267,7 +267,7 @@ async function generatePDF(client, filters) {
             const payment = client.paymentReceived[key];
             entries.push({
                 type: "Payment",
-                datetime: new Date(`${payment.date}T${payment.time}`),
+                datetime: new Date(${payment.date}T${payment.time}),
                 remarks: [payment.remarks], // Convert to array
                 income: 0,
                 payment: payment.amount
@@ -280,7 +280,7 @@ async function generatePDF(client, filters) {
             const discount = client.discount[key];
             entries.push({
                 type: "Discount",
-                datetime: new Date(`${discount.date}T${discount.time}`),
+                datetime: new Date(${discount.date}T${discount.time}),
                 remarks: [discount.remarks], // Convert to array
                 income: 0,
                 payment: discount.amount
@@ -318,9 +318,9 @@ async function generatePDF(client, filters) {
         rows.push([
             entry.datetime.toLocaleString(),
             entry.remarks.join("\n"), // Convert remarks array to a multi-line string
-            entry.income ? `${entry.income.toFixed(2)}` : "-",
-            entry.payment ? `${entry.payment.toFixed(2)}` : "-",
-            `${balance.toFixed(2)}`
+            entry.income ? ${entry.income.toFixed(2)} : "-",
+            entry.payment ? ${entry.payment.toFixed(2)} : "-",
+            ${balance.toFixed(2)}
         ]);
     });
 
@@ -333,7 +333,7 @@ async function generatePDF(client, filters) {
     // Subheader
     doc.setFontSize(12);
     doc.setFont("helvetica", "normal");
-    doc.text(`Report Generated on: ${new Date().toLocaleDateString()}`, 105, 28, { align: "center" });
+    doc.text(Report Generated on: ${new Date().toLocaleDateString()}, 105, 28, { align: "center" });
 
     // Client Details Section
     doc.setDrawColor(200);
@@ -343,14 +343,14 @@ async function generatePDF(client, filters) {
     doc.setFont("helvetica", "bold");
     doc.text("Client Details", 20, 42);
     doc.setFont("helvetica", "normal");
-    doc.text(`Name: ${client.name}`, 20, 49);
-    doc.text(`Phone: ${client.phone}`, 20, 56);
-    doc.text(`Place: ${client.place}`, 20, 63);
+    doc.text(Name: ${client.name}, 20, 49);
+    doc.text(Phone: ${client.phone}, 20, 56);
+    doc.text(Place: ${client.place}, 20, 63);
 
     // Filter Information
     const filterText = filters.dateFilter === "today" ? "Date: Today"
-        : filters.dateFilter === "specific" ? `Date: ${filters.specificDate}`
-        : filters.dateFilter === "range" ? `Date Range: ${filters.startDate} to ${filters.endDate}`
+        : filters.dateFilter === "specific" ? Date: ${filters.specificDate}
+        : filters.dateFilter === "range" ? Date Range: ${filters.startDate} to ${filters.endDate}
         : "Date: All";
     doc.text(filterText, 150, 49);
 
@@ -371,27 +371,27 @@ async function generatePDF(client, filters) {
     doc.text("Total Income", 15 + boxWidth / 2, boxY + 8, { align: "center" });
     doc.setFontSize(14);
     doc.setTextColor(0, 150, 0);
-    doc.text(`${totalIncome.toFixed(2)}`, 15 + boxWidth / 2, boxY + 15, { align: "center" });
+    doc.text(${totalIncome.toFixed(2)}, 15 + boxWidth / 2, boxY + 15, { align: "center" });
 
     // Total Payment
     doc.setFillColor(255, 204, 204);
-    doc.roundedRect(80, boxY, boxWidth, boxHeight, 3, 3, "FD");
+    doc.roundedRect(77.5, boxY, boxWidth, boxHeight, 3, 3, "FD");
     doc.setFontSize(10);
     doc.setTextColor(0);
-    doc.text("Total Payment", 80 + boxWidth / 2, boxY + 8, { align: "center" });
+    doc.text("Total Payment", 77.5 + boxWidth / 2, boxY + 8, { align: "center" });
     doc.setFontSize(14);
     doc.setTextColor(200, 0, 0);
-    doc.text(`${totalPayment.toFixed(2)}`, 80 + boxWidth / 2, boxY + 15, { align: "center" });
+    doc.text(${totalPayment.toFixed(2)}, 77.5 + boxWidth / 2, boxY + 15, { align: "center" });
 
     // Net Balance
     doc.setFillColor(224, 224, 224);
-    doc.roundedRect(145, boxY, boxWidth, boxHeight, 3, 3, "FD");
+    doc.roundedRect(140, boxY, boxWidth, boxHeight, 3, 3, "FD");
     doc.setFontSize(10);
     doc.setTextColor(0);
-    doc.text("Net Balance", 145 + boxWidth / 2, boxY + 8, { align: "center" });
+    doc.text("Net Balance", 140 + boxWidth / 2, boxY + 8, { align: "center" });
     doc.setFontSize(14);
     doc.setTextColor(0);
-    doc.text(`${balance.toFixed(2)}`, 145 + boxWidth / 2, boxY + 15, { align: "center" });
+    doc.text(${balance.toFixed(2)}, 140 + boxWidth / 2, boxY + 15, { align: "center" });
 
     // Table Section
     doc.autoTable({
@@ -430,7 +430,7 @@ async function generatePDF(client, filters) {
         doc.setPage(i);
         doc.setFontSize(8);
         doc.setTextColor(120);
-        doc.text(`Page ${i} of ${pageCount}`, 105, 287, { align: "center" });
+        doc.text(Page ${i} of ${pageCount}, 105, 287, { align: "center" });
         doc.text("This is a system-generated report.", 105, 293, { align: "center" });
     }
 
