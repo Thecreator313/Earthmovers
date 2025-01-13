@@ -355,10 +355,11 @@ if (client.discount) {
 const pendingAmount = totalAmount - (totalReceived + totalDiscount);
 
 // Update pendingAmount in the header
-document.getElementById('pendingAmount').textContent = `₹${pendingAmount.toFixed(2)}`;
+document.getElementById('pendingAmount').textContent = ₹${pendingAmount.toFixed(2)};
+
 // Store pendingAmount in Firebase
 const pendingRef = ref(database, clients/${clientKey}/pendingAmount);
-set(pendingRef, pendingAmount);            
+set(pendingRef, pendingAmount);
 
 // Optional: Log totals (for debugging)
 console.log({
