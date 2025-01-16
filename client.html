@@ -160,7 +160,7 @@
 </div>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getDatabase, ref, push,set, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDCjhSeMR3MhCvm-OMqqUeGk8X7DQjeDF4",
@@ -355,11 +355,7 @@ if (client.discount) {
 const pendingAmount = totalAmount - (totalReceived + totalDiscount);
 
 // Update pendingAmount in the header
-document.getElementById('pendingAmount').textContent = ₹${pendingAmount.toFixed(2)};
-
-// Store pendingAmount in Firebase
-const pendingRef = ref(database, clients/${clientKey}/pendingAmount);
-set(pendingRef, pendingAmount);
+document.getElementById('pendingAmount').textContent = `₹${pendingAmount.toFixed(2)}`;
 
 // Optional: Log totals (for debugging)
 console.log({
