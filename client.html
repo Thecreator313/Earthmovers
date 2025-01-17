@@ -161,7 +161,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
-
+import { set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
     const firebaseConfig = {
         apiKey: "AIzaSyDCjhSeMR3MhCvm-OMqqUeGk8X7DQjeDF4",
         authDomain: "al-ameen-c9a84.firebaseapp.com",
@@ -356,7 +356,10 @@ const pendingAmount = totalAmount - (totalReceived + totalDiscount);
 
 // Update pendingAmount in the header
 document.getElementById('pendingAmount').textContent = `₹${pendingAmount.toFixed(2)}`;
-
+//update to firbase pendding amount 
+            
+const clientRef = ref(database, `clients/${clientKey}/pendingAmount`);
+set(clientRef, pendingAmount);
 // Optional: Log totals (for debugging)
 console.log({
     totalAmount,
